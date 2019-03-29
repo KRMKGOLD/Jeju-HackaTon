@@ -1,35 +1,36 @@
 package com.example.hackatonproject
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
+import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.example.hackatonproject.data.JejuService
 import com.example.hackatonproject.data.Repo
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.gson.JsonObject
-import com.gun0912.tedpermission.PermissionListener
-import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.ArrayList
+import android.Manifest
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.support.v4.content.ContextCompat
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.MarkerOptions
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.TedPermission
+import java.util.*
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
+class MainActivity : AppCompatActivity(), OnMapReadyCallback{
     private lateinit var map: GoogleMap
 
     private val array =
@@ -46,6 +47,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.mainFragment) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+//        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         val baseUrl = "https://416c3a01.ngrok.io"
         val retrofit = Retrofit.Builder()
@@ -92,14 +98,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             })
         }
 
-        val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
     }
 
-    override fun onMapReady(googleMap : GoogleMap) {
+    override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        for(index in array){
+        for (index in array) {
             makeMarker(index)
         }
 
@@ -108,23 +112,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         map.uiSettings.isCompassEnabled = true
         map.uiSettings.isMyLocationButtonEnabled = true
         map.uiSettings.isZoomControlsEnabled = true
-        map.isMyLocationEnabled = true
 
+        val permissionListener: PermissionListener = object : PermissionListener {
+            @SuppressLint("MissingPermission")
+            override fun onPermissionGranted() {
+                map.isMyLocationEnabled = true
+            }
 
-//        val permissionListener: PermissionListener = object : PermissionListener {
-//            override fun onPermissionGranted() {
-//            }
-//
-//            override fun onPermissionDenied(deniedPermissions: ArrayList<String>?) {
-//
-//            }
-//        }
-//
-//        TedPermission.with(this)
-//            .setPermissionListener(permissionListener)
-//            .setDeniedMessage("위치 권한을 허용하지 않을 경우, GPS 기능을 사용할 수 없습니다.")
-//            .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-//            .check()
+            override fun onPermissionDenied(deniedPermissions: ArrayList<String>?) {
+
+            }
+        }
+
+        TedPermission.with(this)
+            .setPermissionListener(permissionListener)
+            .setDeniedMessage("위치 권한을 허용하지 않을 경우, GPS 기능을 사용할 수 없습니다.")
+            .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+            .check()
     }
 
     private fun makeMarker(locate: LatLng) {
@@ -140,5 +144,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         map.addMarker(makerOptions).showInfoWindow()
     }
-
 }
+
+
+//    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener {
+//        val fragmentManager = supportFragmentManager
+//        val mainfragment = fragmentManager.beginTransaction()
+//
+//        when (it.itemId) {
+//            R.id.navigation_map -> {
+//                mainfragment.replace(R.id.mainFragment, MapFragment()).commitAllowingStateLoss()
+//                return@OnNavigationItemSelectedListener true
+//            }
+//            R.id.navigation_data -> {
+//                mainfragment.replace(R.id.mainFragment, DataFragment()).commitAllowingStateLoss()
+//                return@OnNavigationItemSelectedListener true
+//            }
+//        }
+//        false
+//    }
