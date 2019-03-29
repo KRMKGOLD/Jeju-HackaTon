@@ -9,13 +9,16 @@ import retrofit2.http.POST;
 import java.util.List;
 
 public interface JejuService {
-    @GET("/")
-    Call<List<Repo>> listRepose();
+    @GET("/cctv")
+    Call<List<Repo>> sendCCTVRequest();
+
+    @GET("/lamp")
+    Call<List<Repo>> sendLightRequest();
 
     @POST("/cctv")
     Call<JsonObject> cctvData(@Body JsonObject jsonArray);
 
-    @POST("/dick")
+    @POST("/lamp")
     Call<JsonObject> lightData(@Body JsonObject jsonArray);
 
 }

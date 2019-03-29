@@ -47,7 +47,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var locationManager: LocationManager
     private lateinit var locate: Location
 
-    private val jsonObject = JsonObject()
+    private val jsonObject_cctv = JsonObject()
+    private val jsonObject_light = JsonObject()
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,10 +69,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         var sendsCCTV : Call<JsonObject>
         var sendsLight : Call<JsonObject>
-        val repos = service.listRepose()
+        val requestCCTV = service.sendCCTVRequest()
+        val requestLight = service.sendLightRequest()
 
         getCCTVData.setOnClickListener {
-            sendsCCTV = service.cctvData(jsonObject)
+            sendsCCTV = service.cctvData(jsonObject_cctv)
             sendsCCTV.enqueue(object : Callback<JsonObject> {
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                     Log.d("fail", "send data fail")
@@ -82,7 +84,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.d("succeed - data", "succeed")
                     Log.d("return - data", response.body().toString())
 
-                    repos.enqueue(object : Callback<List<Repo>> {
+                    requestCCTV.enqueue(object : Callback<List<Repo>> {
                         override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
                             Log.d("fail", "get data fail")
                             Log.d("fail - throw", t.toString())
@@ -97,15 +99,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             if(response.body() != null){
                                 for (index in response.body()!!) {
                                     makeCCTVMarker(LatLng(index.latitude.toDouble(), index.longitude.toDouble()))
-
+                                    Log.d("latlng", "${index.latitude}, ${index.longitude}")
                                 }
-
-                                Toast.makeText(this@MainActivity, "데이터를 불러왔습니다.", Toast.LENGTH_SHORT).show()
                             }
-                            else {
-                                Toast.makeText(this@MainActivity, "주변에 CCTV가 없습니다.", Toast.LENGTH_SHORT).show()
-                            }
-
+                            Toast.makeText(this@MainActivity, "데이터를 불러왔습니다.", Toast.LENGTH_SHORT).show()
                         }
                     })
                 }
@@ -113,7 +110,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         getLightData.setOnClickListener {
-            sendsLight = service.lightData(jsonObject)
+            sendsLight = service.lightData(jsonObject_light)
             sendsLight.enqueue(object : Callback<JsonObject> {
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                     Log.d("fail", "send data fail")
@@ -124,7 +121,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.d("succeed - data", "succeed")
                     Log.d("return - data", response.body().toString())
 
-                    repos.enqueue(object : Callback<List<Repo>> {
+                    requestLight.enqueue(object : Callback<List<Repo>> {
                         override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
                             Log.d("fail", "get data fail")
                             Log.d("fail - throw", t.toString())
@@ -139,15 +136,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             if(response.body() != null){
                                 for (index in response.body()!!) {
                                     makeLightMarker(LatLng(index.latitude.toDouble(), index.longitude.toDouble()))
-
                                 }
-
-                                Toast.makeText(this@MainActivity, "데이터를 불러왔습니다.", Toast.LENGTH_SHORT).show()
                             }
-                            else {
-                                Toast.makeText(this@MainActivity, "주변에 가로등이 없습니다.", Toast.LENGTH_SHORT).show()
-                            }
-
+                            Toast.makeText(this@MainActivity, "데이터를 불러왔습니다.", Toast.LENGTH_SHORT).show()
                         }
                     })
                 }
@@ -155,7 +146,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         getAllData.setOnClickListener {
-            sendsCCTV = service.cctvData(jsonObject)
+            sendsCCTV = service.cctvData(jsonObject_cctv)
             sendsCCTV.enqueue(object : Callback<JsonObject> {
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                     Log.d("fail", "send data fail")
@@ -166,7 +157,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.d("succeed - data", "succeed")
                     Log.d("return - data", response.body().toString())
 
-                    repos.enqueue(object : Callback<List<Repo>> {
+                    requestCCTV.enqueue(object : Callback<List<Repo>> {
                         override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
                             Log.d("fail", "get data fail")
                             Log.d("fail - throw", t.toString())
@@ -178,24 +169,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
                             dataArray.clear()
 
-                            if(response.body() != null){
+                            if(response.body() != null && response.body()!!.isEmpty()){
                                 for (index in response.body()!!) {
                                     makeCCTVMarker(LatLng(index.latitude.toDouble(), index.longitude.toDouble()))
-
                                 }
-
-                                Toast.makeText(this@MainActivity, "데이터를 불러왔습니다.", Toast.LENGTH_SHORT).show()
                             }
-                            else {
-                                Toast.makeText(this@MainActivity, "주변에 CCTV가 없습니다.", Toast.LENGTH_SHORT).show()
-                            }
-
+                            Toast.makeText(this@MainActivity, "데이터를 불러왔습니다.", Toast.LENGTH_SHORT).show()
                         }
                     })
                 }
             })
 
-            sendsLight = service.lightData(jsonObject)
+            sendsLight = service.lightData(jsonObject_light)
             sendsLight.enqueue(object : Callback<JsonObject> {
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                     Log.d("fail", "send data fail")
@@ -206,7 +191,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.d("succeed - data", "succeed")
                     Log.d("return - data", response.body().toString())
 
-                    repos.enqueue(object : Callback<List<Repo>> {
+                    requestLight.enqueue(object : Callback<List<Repo>> {
                         override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
                             Log.d("fail", "get data fail")
                             Log.d("fail - throw", t.toString())
@@ -221,15 +206,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             if(response.body() != null){
                                 for (index in response.body()!!) {
                                     makeLightMarker(LatLng(index.latitude.toDouble(), index.longitude.toDouble()))
-
                                 }
-
-                                Toast.makeText(this@MainActivity, "데이터를 불러왔습니다.", Toast.LENGTH_SHORT).show()
                             }
-                            else {
-                                Toast.makeText(this@MainActivity, "주변에 가로등이 없습니다.", Toast.LENGTH_SHORT).show()
-                            }
-
+                            Toast.makeText(this@MainActivity, "데이터를 불러왔습니다.", Toast.LENGTH_SHORT).show()
                         }
                     })
                 }
@@ -240,10 +219,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-
-        for (index in dataArray) {
-            makeCCTVMarker(index)
-        }
 
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(jejuLocation, 10F))
         map.setMinZoomPreference(10F)
@@ -280,11 +255,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             //        val myRow: Int = Math.round( (  ) / 0.04363).toInt()
 //        val myColumn: Int = Math.round( (  ) / 0.05681).toInt()
 
-            var myRow = (myLatitude.minus(33.2536182)).div(0.04363)
-            var myColumn = (myLongitude.minus(126.1632263)).div(0.05681)
+            var myRow = myLatitude.minus(33.2536182)
+            myRow = myRow.div(0.04363)
+            var myColumn = myLongitude.minus(126.1632263)
+            myColumn = myColumn.div(0.05681)
 
-            jsonObject.addProperty("row", Math.round(myRow))
-            jsonObject.addProperty("column", Math.round(myColumn))
+            jsonObject_cctv.addProperty("row", Math.round(myRow))
+            jsonObject_cctv.addProperty("column", Math.round(myColumn) + 3)
+
+            jsonObject_light.addProperty("row", Math.round(myRow))
+            jsonObject_light.addProperty("column", Math.round(myColumn))
+
+//            jsonObject_cctv.addProperty("row", 1)
+//            jsonObject_cctv.addProperty("column", 4)
 
             Log.d("lati-long", "lati : $myLatitude long : $myLongitude")
 
@@ -296,7 +279,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun makeCCTVMarker(locate: LatLng) {
         val smallMarker =
             Bitmap.createScaledBitmap(
-                (ContextCompat.getDrawable(this, R.drawable.ic_camera) as BitmapDrawable).bitmap, 100, 100, false
+                (ContextCompat.getDrawable(this, R.drawable.ic_camera) as BitmapDrawable).bitmap, 25, 25, false
             )
 
         val makerOptions = MarkerOptions()
@@ -310,7 +293,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun makeLightMarker(locate: LatLng) {
         val smallMarker =
             Bitmap.createScaledBitmap(
-                (ContextCompat.getDrawable(this, R.drawable.ic_streetlamp) as BitmapDrawable).bitmap, 100, 100, false
+                (ContextCompat.getDrawable(this, R.drawable.ic_streetlamp) as BitmapDrawable).bitmap, 50, 50, false
             )
 
         val makerOptions = MarkerOptions()
@@ -319,5 +302,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
 
         map.addMarker(makerOptions).showInfoWindow()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+
     }
 }
