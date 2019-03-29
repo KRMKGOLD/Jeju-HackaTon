@@ -1,6 +1,5 @@
 package com.example.hackatonproject.data;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -13,8 +12,10 @@ public interface JejuService {
     @GET("/")
     Call<List<Repo>> listRepose();
 
-    @POST("/")
-    Call<JsonObject> sendRow(@Body JsonObject jsonArray);
-//    Call<Int> sendRow(@Body JsonArray jsonArray);
+    @POST("/cctv")
+    Call<JsonObject> cctvData(@Body JsonObject jsonArray);
+
+    @POST("/dick")
+    Call<JsonObject> lightData(@Body JsonObject jsonArray);
 
 }
