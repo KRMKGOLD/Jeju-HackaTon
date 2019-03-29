@@ -12,11 +12,11 @@ public interface JejuService {
     @GET("/cctv")
     Call<List<Repo>> sendCCTVRequest();
 
-    @GET("/lamp")
-    Call<List<Repo>> sendLightRequest();
-
     @POST("/cctv")
     Call<JsonObject> cctvData(@Body JsonObject jsonArray);
+
+    @GET("/lamp")
+    Call<List<Repo>> sendLightRequest();
 
     @POST("/lamp")
     Call<JsonObject> lightData(@Body JsonObject jsonArray);

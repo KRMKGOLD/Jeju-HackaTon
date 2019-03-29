@@ -67,8 +67,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             supportFragmentManager.findFragmentById(R.id.mainFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        var sendsCCTV : Call<JsonObject>
-        var sendsLight : Call<JsonObject>
+        var sendsCCTV: Call<JsonObject>
+        var sendsLight: Call<JsonObject>
         val requestCCTV = service.sendCCTVRequest()
         val requestLight = service.sendLightRequest()
 
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
                             dataArray.clear()
 
-                            if(response.body() != null){
+                            if (response.body() != null) {
                                 for (index in response.body()!!) {
                                     makeCCTVMarker(LatLng(index.latitude.toDouble(), index.longitude.toDouble()))
                                     Log.d("latlng", "${index.latitude}, ${index.longitude}")
@@ -133,77 +133,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
                             dataArray.clear()
 
-                            if(response.body() != null){
-                                for (index in response.body()!!) {
-                                    makeLightMarker(LatLng(index.latitude.toDouble(), index.longitude.toDouble()))
-                                }
-                            }
-                            Toast.makeText(this@MainActivity, "데이터를 불러왔습니다.", Toast.LENGTH_SHORT).show()
-                        }
-                    })
-                }
-            })
-        }
-
-        getAllData.setOnClickListener {
-            sendsCCTV = service.cctvData(jsonObject_cctv)
-            sendsCCTV.enqueue(object : Callback<JsonObject> {
-                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                    Log.d("fail", "send data fail")
-                    Log.d("fail - throw", t.toString())
-                }
-
-                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                    Log.d("succeed - data", "succeed")
-                    Log.d("return - data", response.body().toString())
-
-                    requestCCTV.enqueue(object : Callback<List<Repo>> {
-                        override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
-                            Log.d("fail", "get data fail")
-                            Log.d("fail - throw", t.toString())
-                        }
-
-                        override fun onResponse(call: Call<List<Repo>>, response: Response<List<Repo>>) {
-                            Log.d("succeed - data", "succeed")
-                            Log.d("return - data", response.body().toString())
-
-                            dataArray.clear()
-
-                            if(response.body() != null && response.body()!!.isEmpty()){
-                                for (index in response.body()!!) {
-                                    makeCCTVMarker(LatLng(index.latitude.toDouble(), index.longitude.toDouble()))
-                                }
-                            }
-                            Toast.makeText(this@MainActivity, "데이터를 불러왔습니다.", Toast.LENGTH_SHORT).show()
-                        }
-                    })
-                }
-            })
-
-            sendsLight = service.lightData(jsonObject_light)
-            sendsLight.enqueue(object : Callback<JsonObject> {
-                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                    Log.d("fail", "send data fail")
-                    Log.d("fail - throw", t.toString())
-                }
-
-                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                    Log.d("succeed - data", "succeed")
-                    Log.d("return - data", response.body().toString())
-
-                    requestLight.enqueue(object : Callback<List<Repo>> {
-                        override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
-                            Log.d("fail", "get data fail")
-                            Log.d("fail - throw", t.toString())
-                        }
-
-                        override fun onResponse(call: Call<List<Repo>>, response: Response<List<Repo>>) {
-                            Log.d("succeed - data", "succeed")
-                            Log.d("return - data", response.body().toString())
-
-                            dataArray.clear()
-
-                            if(response.body() != null){
+                            if (response.body() != null) {
                                 for (index in response.body()!!) {
                                     makeLightMarker(LatLng(index.latitude.toDouble(), index.longitude.toDouble()))
                                 }
@@ -252,7 +182,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             myLatitude = locate.latitude
             myLongitude = locate.longitude
 
-            //        val myRow: Int = Math.round( (  ) / 0.04363).toInt()
+//            val myRow: Int = Math.round(() / 0.04363).toInt()
 //        val myColumn: Int = Math.round( (  ) / 0.05681).toInt()
 
             var myRow = myLatitude.minus(33.2536182)
@@ -263,7 +193,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             jsonObject_cctv.addProperty("row", Math.round(myRow))
             jsonObject_cctv.addProperty("column", Math.round(myColumn) + 3)
 
-            jsonObject_light.addProperty("row", Math.round(myRow))
+            jsonObject_light.addProperty("row", Math.round(myRow) - 1)
             jsonObject_light.addProperty("column", Math.round(myColumn))
 
 //            jsonObject_cctv.addProperty("row", 1)
@@ -302,10 +232,5 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
 
         map.addMarker(makerOptions).showInfoWindow()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-
     }
 }
